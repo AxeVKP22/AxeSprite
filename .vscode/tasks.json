@@ -1,0 +1,44 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build project",
+            "type": "shell",
+            "command": "C:\\w64devkit\\w64devkit\\bin\\g++.exe",
+            "args": [
+                "-g",
+                "src\\main.cpp",
+                "src\\globals.cpp",
+                "src\\init\\imgui.cpp",
+                "src\\menu\\menu.cpp",
+                "libs\\glad\\src\\glad.c",
+                "libs\\imgui\\imgui.cpp",
+                "libs\\imgui\\imgui_draw.cpp",
+                "libs\\imgui\\imgui_tables.cpp",
+                "libs\\imgui\\imgui_widgets.cpp",
+                "libs\\imgui\\backends\\imgui_impl_glfw.cpp",
+                "libs\\imgui\\backends\\imgui_impl_opengl3.cpp",
+                "-Ilibs\\glfw\\include",
+                "-Ilibs\\imgui",
+                "-Ilibs\\glad\\include",
+                "-Llibs\\glfw\\lib-mingw-w64",
+                "-lglfw3",
+                "-lopengl32",
+                "-lgdi32",
+                "-luser32",
+                "-lshell32",
+                "-lcomdlg32",
+                "-o",
+                "build\\AxeSprite.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+    ]
+}
