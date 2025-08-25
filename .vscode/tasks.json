@@ -11,6 +11,7 @@
                 "src\\globals.cpp",
                 "src\\init\\imgui.cpp",
                 "src\\menu\\menu.cpp",
+                "src\\canvas\\canvas.cpp",
                 "libs\\glad\\src\\glad.c",
                 "libs\\imgui\\imgui.cpp",
                 "libs\\imgui\\imgui_draw.cpp",

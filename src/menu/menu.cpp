@@ -4,22 +4,21 @@ bool isFileSubMenuOpen = false;
 bool isNewPressed = false;
 bool isOpenPressed = false;
 
-char pathToFile[MAX_PATH];
+char pathToFile[MAX_PATH_LENGHT];
 
 int newWidth;
 int newheight;
 
-void imGuiRenderMenuWindow(GLFWwindow* window, const char* windowName) {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();                                                          
-    ImGui::Begin(windowName, nullptr);
+char newName[32];
+std::vector<std::string> canvasNames;
 
+void imGuiRenderMenuWindow(GLFWwindow* window, const char* windowName) {                                                         
+    ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiCond_Always);
+    ImGui::Begin(windowName, nullptr);
 
     if (ImGui::SmallButton("File")) {
         isFileSubMenuOpen = !isFileSubMenuOpen;
     }
-
 
     if (isFileSubMenuOpen) {
         imGuiRenderFileSubMenu();
@@ -34,16 +33,7 @@ void imGuiRenderMenuWindow(GLFWwindow* window, const char* windowName) {
             isOpenPressed = !isOpenPressed;
         }
     }
-
     ImGui::End();
-    ImGui::Render();
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-    glViewport(0, 0, width, height);
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    glfwSwapBuffers(window);
 }
 
 void imGuiRenderFileSubMenu() {
@@ -68,9 +58,25 @@ void imGuiRenderNewSubMenu() {
     ImGui::Begin("New", nullptr);
     ImGui::InputInt("width", &newWidth);
     ImGui::InputInt("height", &newheight);
+    ImGui::InputText("Name", newName, 32);
+
     if (ImGui::SmallButton("Create")) {
-        
+    if (newWidth > 0 && newheight > 0 && strlen(newName) > 0) {
+        bool exists = false;
+        for (int i = 0; i < canvasNames.size(); i++) {
+            if (canvasNames[i] == newName) {
+                exists = true;  // нашли такое имя
+                break;
+            }
+        }
+
+        if (!exists) {
+            canvasNames.push_back(std::string(newName));
+            renderCanvasWindow = true;
+            isNewPressed = false;
+        }
     }
+}
 
     if (ImGui::SmallButton("Close")) {
         isNewPressed = !isNewPressed;
@@ -79,20 +85,20 @@ void imGuiRenderNewSubMenu() {
 }
 
 int imGuiRenderOpenSubMenu() {
-    WCHAR filename[MAX_PATH] = L"";
+    WCHAR filename[MAX_PATH_LENGHT] = L"";
 
     OPENFILENAMEW ofn{};
     ofn.lStructSize = sizeof(ofn);
     ofn.lpstrFile = filename;
-    ofn.nMaxFile = MAX_PATH;
+    ofn.nMaxFile = MAX_PATH_LENGHT;
     ofn.lpstrFilter = L"All Files\0*.*\0\0";
     ofn.nFilterIndex = 1;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
     if (GetOpenFileNameW(&ofn)) {
-        char buf[MAX_PATH];
-        wcstombs(pathToFile, filename, MAX_PATH);
-        wcstombs(buf, filename, MAX_PATH);
+        char buf[MAX_PATH_LENGHT];
+        wcstombs(pathToFile, filename, MAX_PATH_LENGHT);
+        wcstombs(buf, filename, MAX_PATH_LENGHT);
         return 0;
     }
     else {
