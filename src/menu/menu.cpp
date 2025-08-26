@@ -39,11 +39,11 @@ void imGuiRenderMenuWindow(GLFWwindow* window, const char* windowName) {
 void imGuiRenderFileSubMenu() {
     ImGui::SetNextWindowSize(ImVec2(120, 90), ImGuiCond_Always);
     ImGui::Begin("File submenu", nullptr, ImGuiWindowFlags_NoResize);
-    if (ImGui::SmallButton("New")) {
+    if (ImGui::SmallButton("New file")) {
         isNewPressed = !isNewPressed;
     }
 
-    if (ImGui::SmallButton("Open")) {
+    if (ImGui::SmallButton("Open file")) {
         isOpenPressed = !isOpenPressed;
     }
     
@@ -65,7 +65,7 @@ void imGuiRenderNewSubMenu() {
         bool exists = false;
         for (int i = 0; i < canvasNames.size(); i++) {
             if (canvasNames[i] == newName) {
-                exists = true;  // нашли такое имя
+                exists = true;
                 break;
             }
         }
