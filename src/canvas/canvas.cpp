@@ -10,24 +10,44 @@ static int width = 0, height = 0;
 std::vector<uint32_t> pixel;
 
 void imGuiRenderCanvasWindow(GLFWwindow* window, const char* windowName) {
-    static bool loaded = false;
-    
-    if (!loaded) {
-        int numChannels;
-        unsigned char* bytes = stbi_load("test/image.png", &width, &height, &numChannels, 4);
-        if (bytes) {
-            glGenTextures(1, &texture);
-            glBindTexture(GL_TEXTURE_2D, texture);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, bytes);
-            stbi_image_free(bytes);
-            loaded = true;
-        }
-        if (!bytes) {
-        std::cout << "Failed to load image: test/image.png" << std::endl;
-        }
+static bool loaded = false;
+
+if (!loaded) {
+    if (!glfwGetCurrentContext()) {
+        std::cout << "No OpenGL context active! Cannot load texture yet." << std::endl;
+        return; // ждем контекста
     }
+
+    int numChannels;
+    unsigned char* bytes = stbi_load("../test/boards_demo_11.png", &width, &height, &numChannels, STBI_rgb_alpha);
+    if (!bytes) {
+        std::cout << "FAILED TO LOAD IMAGE!" << std::endl;
+        return;
+    }
+
+    std::cout << "Loaded " << width << "x" << height << std::endl;
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, bytes);
+
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cout << "OpenGL error after glTexImage2D: " << err << std::endl;
+    }
+
+    stbi_image_free(bytes);
+    loaded = true;
+}
+
 
     for (int i = 0; i < canvasNames.size(); i++) {
         ImGui::Begin((std::string("Canvas: ") + canvasNames[i]).c_str(), nullptr);
@@ -35,9 +55,10 @@ void imGuiRenderCanvasWindow(GLFWwindow* window, const char* windowName) {
         ImGui::BeginChild("test", ImVec2((float)width, (float)height));
 
         if (texture != 0) {
-            ImDrawList* drawList = ImGui::GetWindowDrawList();
-            ImVec2 pos = ImGui::GetCursorScreenPos();
             ImGui::Image((ImTextureID)(intptr_t)texture, ImVec2((float)width, (float)height));
+        }
+        else {
+            ImGui::Text("Texture not loaded");
         }
 
         ImGui::EndChild();
