@@ -3,17 +3,17 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/libs/stb",
-                "${workspaceFolder}/libs/glad/include",
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/libs/raylib/",
+                "${workspaceFolder}/libs/rlImGui",
                 "${workspaceFolder}/libs/imgui",
-                "${workspaceFolder}/libs/glfw/include",
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/libs/stb"
             ],
             "defines": [],
             "compilerPath": "C:/w64devkit/w64devkit/bin/g++.exe",
-            "cStandard": "c17",
+            "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-x64"
+            "intelliSenseMode": "windows-gcc-x64"
         }
     ],
     "version": 4

@@ -4,37 +4,34 @@
 #include "menu/menu.hpp"
 #include "canvas/canvas.hpp"
 
+Color blackGray = {20, 20, 20, 255};
+
 int main() {
 
-    GLFWwindow* window = glfwCreateWndw(800,  800, "AxeSprite");
+    rlCreateWindow(800, 800, "AxeSprite");
+    rlImGuiSetup(true);
 
-    imGuiInit(window);
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(blackGray);
 
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
+        rlImGuiBegin();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();  
+        io.IniFilename = nullptr;
 
-        imGuiRenderMenuWindow(window, "Menu");
+        imGuiRenderMenuWindow("Menu");
 
         if (!canvasNames.empty()) {
-            imGuiRenderCanvasWindow(window, "Canvas");
+            imGuiRenderCanvasWindow("Canvas");
+
         }
-
-
-        ImGui::Render();
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        glViewport(0, 0, width, height);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        glfwSwapBuffers(window);
+        rlImGuiEnd();
+        EndDrawing();
     }
-
-    imGuiShutdown(window);
+    rlImGuiShutdown();
+    CloseWindow();
 
     return 0;
 }
