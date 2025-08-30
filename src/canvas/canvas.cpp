@@ -1,7 +1,9 @@
 #include "canvas.hpp"
 
 float myColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-std::vector<uint32_t> pixel;
+std::vector<unsigned char> pixel(newWidth * newHeight * 4);
+bool initialized = false;
+Texture2D texture;
 
 void imGuiRenderCanvasWindow(const char* windowName) {
     for (int i = 0; i < canvasNames.size(); i++) {
@@ -18,3 +20,15 @@ void imGuiRenderCanvasWindow(const char* windowName) {
         ImGui::End();
     }
 }
+
+void renderTexture() {
+    if (!initialized) {
+        texture = LoadTexture(pathToFile);
+        initialized = true;
+    }
+
+    ImGui::Begin("Pixel Window");
+    ImGui::Image((void*)(intptr_t)texture.id, ImVec2(texture.width, texture.height));
+    ImGui::End();
+}
+    

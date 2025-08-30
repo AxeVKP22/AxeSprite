@@ -7,24 +7,27 @@
 Color blackGray = {20, 20, 20, 255};
 
 int main() {
+    
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 
     rlCreateWindow(800, 800, "AxeSprite");
     rlImGuiSetup(true);
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+
+    io.IniFilename = nullptr;
 
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(blackGray);
 
         rlImGuiBegin();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO();
-
-        io.IniFilename = nullptr;
 
         imGuiRenderMenuWindow("Menu");
 
         if (!canvasNames.empty()) {
             imGuiRenderCanvasWindow("Canvas");
+            renderTexture();
 
         }
         rlImGuiEnd();

@@ -67,22 +67,22 @@ void imGuiRenderNewSubMenu() {
     ImGui::InputText("Name", newName, 32);
 
     if (ImGui::SmallButton("Create")) {
-    if (newWidth > 0 && newHeight > 0 && strlen(newName) > 0) {
-        bool exists = false;
-        for (int i = 0; i < canvasNames.size(); i++) {
-            if (canvasNames[i] == newName) {
-                exists = true;
-                break;
+        if (newWidth > 0 && newHeight > 0 && strlen(newName) > 0) {
+            bool exists = false;
+            for (int i = 0; i < canvasNames.size(); i++) {
+                if (canvasNames[i] == newName) {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists) {
+                canvasNames.push_back(std::string(newName));
+                renderCanvasWindow = true;
+                isNewPressed = false;
             }
         }
-
-        if (!exists) {
-            canvasNames.push_back(std::string(newName));
-            renderCanvasWindow = true;
-            isNewPressed = false;
-        }
-    }
-}
+    }   
 
     if (ImGui::SmallButton("Close")) {
         isNewPressed = !isNewPressed;
