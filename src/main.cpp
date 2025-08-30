@@ -27,7 +27,6 @@ int main() {
 
         if (!canvasNames.empty()) {
             imGuiRenderCanvasWindow("Canvas");
-            renderTexture();
 
         }
         rlImGuiEnd();

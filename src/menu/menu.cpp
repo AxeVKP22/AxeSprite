@@ -1,7 +1,7 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <commdlg.h> // GetOpenFileNameW
+#include <commdlg.h>
 #endif
 
 #include "menu.hpp"
@@ -9,13 +9,14 @@
 bool isFileSubMenuOpen = false;
 bool isNewPressed = false;
 bool isOpenPressed = false;
+bool isOpenSelected;
 
 char pathToFile[MAX_PATH_LENGHT];
+char newName[32];
 
 int newWidth;
 int newHeight;
 
-char newName[32];
 std::vector<std::string> canvasNames;
 
 void imGuiRenderMenuWindow(const char* windowName) {                                                         
@@ -35,8 +36,23 @@ void imGuiRenderMenuWindow(const char* windowName) {
     }
 
     if (isOpenPressed) {
-        if (imGuiRenderOpenSubMenu() == -1) {
-            isOpenPressed = !isOpenPressed;
+        returnOpenCode result = imGuiRenderOpenSubMenu();
+        if (result.success) {
+            bool exists = false;
+            for (int i = 0; i < canvasNames.size(); i++) {
+                if (canvasNames[i] == result.filename) {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists) {
+                canvasNames.push_back(std::string(result.filename));
+            }
+            isOpenPressed = false;
+        }
+        else if (!result.success) {
+            isOpenPressed = false;
         }
     }
     ImGui::End();
@@ -78,7 +94,6 @@ void imGuiRenderNewSubMenu() {
 
             if (!exists) {
                 canvasNames.push_back(std::string(newName));
-                renderCanvasWindow = true;
                 isNewPressed = false;
             }
         }
@@ -90,7 +105,7 @@ void imGuiRenderNewSubMenu() {
     ImGui::End();
 }
 
-int imGuiRenderOpenSubMenu() {
+returnOpenCode imGuiRenderOpenSubMenu() {
 #ifdef _WIN32
     WCHAR filename[MAX_PATH_LENGHT] = L"";
 
@@ -104,8 +119,16 @@ int imGuiRenderOpenSubMenu() {
 
     if (GetOpenFileNameW(&ofn)) {
         wcstombs(pathToFile, filename, MAX_PATH_LENGHT);
-        return 0;
+
+        const char* lastSlash = strrchr(pathToFile, '\\');
+        if (!lastSlash) lastSlash = strrchr(pathToFile, '/');
+
+        std::string fileNameOnly = lastSlash ? std::string(lastSlash + 1) : std::string(pathToFile);
+
+        isOpenSelected = true;
+
+        return {true, fileNameOnly};
     }
 #endif
-    return -1;
+    return {false, ""};
 }
