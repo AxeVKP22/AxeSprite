@@ -10,6 +10,7 @@ bool isFileSubMenuOpen = false;
 bool isNewPressed = false;
 bool isOpenPressed = false;
 bool isOpenSelected;
+bool isNewSelected;
 
 char pathToFile[MAX_PATH_LENGHT];
 char newName[32];
@@ -95,6 +96,7 @@ void imGuiRenderNewSubMenu() {
             if (!exists) {
                 canvasNames.push_back(std::string(newName));
                 isNewPressed = false;
+                isNewSelected = true;
             }
         }
     }   

@@ -13,6 +13,7 @@ extern bool isNewPressed;
 extern bool isOpenPressed;
 extern bool isNewSelected;
 extern bool isOpenSelected;
+extern bool isNewSelected;
 
 extern char pathToFile[MAX_PATH_LENGHT];
 extern char newName[32];

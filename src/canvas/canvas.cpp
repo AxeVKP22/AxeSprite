@@ -1,16 +1,28 @@
 #include "canvas.hpp"
 
 float myColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-std::vector<unsigned char> pixel(newWidth * newHeight * 4);
+std::vector<Color> pixels;
 bool initialized = false;
 Texture2D texture;
 
 void imGuiRenderCanvasWindow(const char* windowName) {
     for (int i = 0; i < canvasNames.size(); i++) {
         if (!initialized) {
-            texture = LoadTexture(pathToFile);
+            if (isOpenSelected) {
+                if (texture.id > 0) UnloadTexture(texture);
+                texture = LoadTexture(pathToFile);
+            } 
+
+            else if (isNewSelected) {
+                if (texture.id > 0) UnloadTexture(texture);
+
+                Image img = GenImageColor(newWidth, newHeight, WHITE);
+                texture = LoadTextureFromImage(img);
+                UnloadImage(img);
+            }
+
             initialized = true;
-        }   
+        }
         ImGui::Begin((std::string("Canvas: ") + canvasNames[i]).c_str(), nullptr);
 
         ImGui::BeginChild("file", ImVec2(150, 30));
@@ -22,7 +34,7 @@ void imGuiRenderCanvasWindow(const char* windowName) {
         ImGui::EndChild();
 
         ImGui::SameLine();
-        
+    
         ImGui::BeginChild("Pixel Window", ImVec2(texture.width, texture.height));
         ImGui::Image((void*)(intptr_t)texture.id, ImVec2(texture.width, texture.height));
         ImGui::EndChild();
@@ -41,4 +53,3 @@ void renderTexture() {
     ImGui::Image((void*)(intptr_t)texture.id, ImVec2(texture.width, texture.height));
     ImGui::End();
 }
-    
