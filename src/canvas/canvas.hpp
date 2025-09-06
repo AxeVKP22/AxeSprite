@@ -10,6 +10,7 @@
 #include "../menu/menu.hpp"
 
 extern float myColor[4];
+extern float zoom;
 
 void imGuiRenderCanvasWindow(const char* windowName);
 void renderTexture();
