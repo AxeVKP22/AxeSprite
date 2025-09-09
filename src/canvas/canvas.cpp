@@ -1,10 +1,15 @@
 #include "canvas.hpp"
 
 float myColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+float transparent[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
 std::vector<Color> pixels;
+std::vector<std::array<float, 4>> recentColors;
+
 bool initialized = false;
+
 Texture2D texture;
+Image image;
 
 float zoom = 1.0f;
 
@@ -12,18 +17,27 @@ ImVec2 resolution;
 
 void imGuiRenderCanvasWindow(const char* windowName) {
     for (int i = 0; i < canvasNames.size(); i++) {
+        //-------------------------------
+        // create/load texture
+        //-------------------------------
         if (!initialized) {
             if (isOpenSelected) {
-                if (texture.id > 0) UnloadTexture(texture);
+                if (texture.id > 0) {
+                   UnloadTexture(texture); 
+                   UnloadImage(image);
+                }
+                image = LoadImage(pathToFile);
                 texture = LoadTexture(pathToFile);
             } 
 
             else if (isNewSelected) {
-                if (texture.id > 0) UnloadTexture(texture);
-                
-                Image img = GenImageColor(newWidth, newHeight, WHITE);
-                texture = LoadTextureFromImage(img);
-                UnloadImage(img);
+                if (texture.id > 0) {
+                    UnloadTexture(texture);
+                    UnloadImage(image);
+                }
+
+                image = GenImageColor(newWidth, newHeight, WHITE);
+                texture = LoadTextureFromImage(image);
             }
 
             initialized = true;
@@ -31,12 +45,42 @@ void imGuiRenderCanvasWindow(const char* windowName) {
         ImGui::Begin((std::string("Canvas: ") + canvasNames[i]).c_str(), nullptr);
 
         ImGui::BeginChild("file", ImVec2(150, 30));
-        ImGui::SmallButton("File");
+            ImGui::SmallButton("File");
         ImGui::EndChild();
 
+        //-------------------------------
+        // color picker and recent colors
+        //-------------------------------
+
         ImGui::BeginChild("color", ImVec2(300, 300));
-        ImGui::ColorPicker4("Color", myColor);
-        ImGui::EndChild();
+            ImGui::ColorPicker4("Color", myColor);
+
+            for (int i = 0; i < recentColors.size(); i++) {
+                ImVec4 c = ImVec4(
+                    recentColors[i][0],
+                    recentColors[i][1],
+                    recentColors[i][2],
+                    recentColors[i][3]
+                );
+
+                std::string id = "##col" + std::to_string(i);
+                if (ImGui::ColorButton(id.c_str(), c, 0, ImVec2(16, 16))) {
+                    myColor[0] = recentColors[i][0];
+                    myColor[1] = recentColors[i][1];
+                    myColor[2] = recentColors[i][2];
+                    myColor[3] = recentColors[i][3];
+                }
+
+                if ((i + 1) % 6 != 0) {
+                    ImGui::SameLine();
+                }
+
+            }  
+        ImGui::EndChild(); 
+
+        //-------------------------------
+        // zoom
+        //-------------------------------
 
         float mouse = ImGui::GetIO().MouseWheel;
         if (!ImGui::IsWindowHovered() && mouse != 0.0f) {
@@ -48,18 +92,89 @@ void imGuiRenderCanvasWindow(const char* windowName) {
 
         ImGui::SameLine();
     
+        //-------------------------------
+        // canvas
+        //-------------------------------
+
         ImGui::BeginChild("Pixel Window", ImVec2(0, 0), true);
-        ImVec2 resolution = ImGui::GetContentRegionAvail();
+            ImVec2 resolution = ImGui::GetContentRegionAvail();
 
-        ImVec2 textureSize = ImVec2(texture.width * zoom, texture.height * zoom);
+            ImVec2 textureSize = ImVec2(texture.width * zoom, texture.height * zoom);
 
-        ImVec2 texturePos;
-        texturePos.x = std::max((resolution.x - textureSize.x) * 0.5f, 0.0f);
-        texturePos.y = std::max((resolution.y - textureSize.y) * 0.5f, 0.0f);
+            ImVec2 texturePos;
+            texturePos.x = std::max((resolution.x - textureSize.x) * 0.5f, 0.0f);
+            texturePos.y = std::max((resolution.y - textureSize.y) * 0.5f, 0.0f);
 
-        ImGui::SetCursorPos(texturePos);
+            ImGui::SetCursorPos(texturePos);
 
-        ImGui::Image((void*)(intptr_t)texture.id, textureSize);
+            ImGui::Image((void*)(intptr_t)texture.id, textureSize);
+
+            //-------------------------------
+            // draw
+            //-------------------------------
+
+            if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+                std::array<float,4> temColor = { myColor[0], myColor[1], myColor[2], myColor[3] };
+
+                bool exists = false;
+                for (const auto& c : recentColors) {
+                    if (c == temColor) {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists) {
+                    recentColors.push_back(temColor);
+                }
+
+                ImVec2 mousePos = ImGui::GetMousePos();
+                ImVec2 windowPos = ImGui::GetItemRectMin();
+                float localX = (mousePos.x - windowPos.x) / zoom;
+                float localY = (mousePos.y - windowPos.y) / zoom;
+
+                int pixelX = (int)localX;
+                int pixelY = (int)localY;
+
+                if (pixelX >= 0 && pixelY < image.width && pixelY >= 0 && pixelY < image.height) {
+                    Color c = {
+                        (unsigned char)(myColor[0] * 255),
+                        (unsigned char)(myColor[1] * 255),
+                        (unsigned char)(myColor[2] * 255),
+                        (unsigned char)(myColor[3] * 255)
+                    };
+        
+                    ImageDrawPixel(&image, pixelX, pixelY, c);
+                    UpdateTexture(texture, image.data);
+                }
+            }
+
+            //-------------------------------
+            // erase
+            //-------------------------------
+
+            else if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+                ImVec2 mousePos = ImGui::GetMousePos();
+                ImVec2 windowPos = ImGui::GetItemRectMin();
+                float localX = (mousePos.x - windowPos.x) / zoom;
+                float localY = (mousePos.y - windowPos.y) / zoom;
+
+                int pixelX = (int)localX;
+                int pixelY = (int)localY;
+
+                if (pixelX >= 0 && pixelY < image.width && pixelY >= 0 && pixelY < image.height) {
+                    Color c = {
+                        (unsigned char)(transparent[0] * 255),
+                        (unsigned char)(transparent[1] * 255),
+                        (unsigned char)(transparent[2] * 255),
+                        (unsigned char)(transparent[3] * 255)
+                    };
+        
+                    ImageDrawPixel(&image, pixelX, pixelY, c);
+                    UpdateTexture(texture, image.data);
+                }
+            }
+
         ImGui::EndChild();
 
         ImGui::End();

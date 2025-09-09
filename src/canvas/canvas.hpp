@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cstdint>
+#include <array>
 
 #include "rlImGui.h"
 #include "raylib.h"
@@ -10,6 +11,8 @@
 #include "../menu/menu.hpp"
 
 extern float myColor[4];
+extern float transparent[4];
+
 extern float zoom;
 
 void imGuiRenderCanvasWindow(const char* windowName);

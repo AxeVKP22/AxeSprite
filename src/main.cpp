@@ -27,8 +27,8 @@ int main() {
 
         if (!canvasNames.empty()) {
             imGuiRenderCanvasWindow("Canvas");
-
         }
+        
         rlImGuiEnd();
         EndDrawing();
     }

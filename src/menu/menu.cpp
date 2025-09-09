@@ -19,9 +19,11 @@ int newWidth;
 int newHeight;
 
 std::vector<std::string> canvasNames;
-
+//-------------------------------
+// main menu render 
+//-------------------------------
 void imGuiRenderMenuWindow(const char* windowName) {                                                         
-    ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiCond_Once);
     ImGui::Begin(windowName, nullptr);
 
     if (ImGui::SmallButton("File")) {
@@ -58,9 +60,11 @@ void imGuiRenderMenuWindow(const char* windowName) {
     }
     ImGui::End();
 }
-
+//-------------------------------
+// render sub menu
+//-------------------------------
 void imGuiRenderFileSubMenu() {
-    ImGui::SetNextWindowSize(ImVec2(120, 90), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(120, 90), ImGuiCond_Once);
     ImGui::Begin("File submenu", nullptr, ImGuiWindowFlags_NoResize);
     if (ImGui::SmallButton("New file")) {
         isNewPressed = !isNewPressed;
@@ -75,7 +79,9 @@ void imGuiRenderFileSubMenu() {
     }
     ImGui::End();
 }
-
+//-------------------------------
+// create a new file
+//-------------------------------
 void imGuiRenderNewSubMenu() {
     ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiCond_Always);
     ImGui::Begin("New", nullptr);
@@ -107,6 +113,9 @@ void imGuiRenderNewSubMenu() {
     ImGui::End();
 }
 
+//-------------------------------
+// get path to file
+//-------------------------------
 returnOpenCode imGuiRenderOpenSubMenu() {
 #ifdef _WIN32
     WCHAR filename[MAX_PATH_LENGHT] = L"";
