@@ -8,7 +8,6 @@
             "args": [
                 "-g",
                 "src/main.cpp",
-                "src/globals.cpp",
                 "src/init/imgui.cpp",
                 "src/menu/menu.cpp",
                 "src/canvas/canvas.cpp",

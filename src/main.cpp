@@ -1,5 +1,4 @@
 #include <iostream>
-#include "globals.hpp"
 #include "init/imgui.hpp"
 #include "menu/menu.hpp"
 #include "canvas/canvas.hpp"

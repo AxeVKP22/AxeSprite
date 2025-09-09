@@ -24,12 +24,14 @@ std::vector<std::string> canvasNames;
 // main menu render 
 //-------------------------------
 void imGuiRenderMenuWindow(const char* windowName) {                                                         
-    ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(315, 150), ImGuiCond_Once);
     ImGui::Begin(windowName, nullptr);
 
     if (ImGui::SmallButton("File")) {
         isFileSubMenuOpen = !isFileSubMenuOpen;
     }
+
+    ImGui::Text("\n\nWelcome to AxeSprite!\nit`s a lightweight pixel art tool\n\n\nrepo: https://github.com/AxeVKP22/AxeSprite");
 
     if (isFileSubMenuOpen) {
         imGuiRenderFileSubMenu();

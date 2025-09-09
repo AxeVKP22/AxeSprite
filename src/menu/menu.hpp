@@ -4,7 +4,6 @@
 #include "backends/imgui_impl_opengl3.h"
 #include <iostream>
 #include <vector>
-#include "../globals.hpp"
 
 #define MAX_PATH_LENGHT 260
 
