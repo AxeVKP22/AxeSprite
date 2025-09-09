@@ -3,20 +3,20 @@
 float myColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
 float transparent[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
+ImGuiWindowFlags windowFlags = 0;
+
 std::vector<Color> pixels;
 std::vector<std::array<float, 4>> recentColors;
 
 bool initialized = false;
-
 Texture2D texture;
 Image image;
-
 float zoom = 1.0f;
-
 ImVec2 resolution;
 
 void imGuiRenderCanvasWindow(const char* windowName) {
     for (int i = 0; i < canvasNames.size(); i++) {
+
         //-------------------------------
         // create/load texture
         //-------------------------------
@@ -35,14 +35,13 @@ void imGuiRenderCanvasWindow(const char* windowName) {
                     UnloadTexture(texture);
                     UnloadImage(image);
                 }
-
                 image = GenImageColor(newWidth, newHeight, WHITE);
                 texture = LoadTextureFromImage(image);
             }
-
             initialized = true;
         }
-        ImGui::Begin((std::string("Canvas: ") + canvasNames[i]).c_str(), nullptr);
+
+        ImGui::Begin((std::string("Canvas: ") + canvasNames[i]).c_str(), 0, windowFlags);
 
         ImGui::BeginChild("file", ImVec2(150, 30));
             ImGui::SmallButton("File");
@@ -51,10 +50,8 @@ void imGuiRenderCanvasWindow(const char* windowName) {
         //-------------------------------
         // color picker and recent colors
         //-------------------------------
-
-        ImGui::BeginChild("color", ImVec2(300, 300));
+        ImGui::BeginChild("color", ImVec2(300, 340));
             ImGui::ColorPicker4("Color", myColor);
-
             for (int i = 0; i < recentColors.size(); i++) {
                 ImVec4 c = ImVec4(
                     recentColors[i][0],
@@ -81,7 +78,6 @@ void imGuiRenderCanvasWindow(const char* windowName) {
         //-------------------------------
         // zoom
         //-------------------------------
-
         float mouse = ImGui::GetIO().MouseWheel;
         if (!ImGui::IsWindowHovered() && mouse != 0.0f) {
             zoom += (mouse + 0.1f);
@@ -95,88 +91,111 @@ void imGuiRenderCanvasWindow(const char* windowName) {
         //-------------------------------
         // canvas
         //-------------------------------
+        bool blockMove = false;
 
         ImGui::BeginChild("Pixel Window", ImVec2(0, 0), true);
+            if (ImGui::IsWindowHovered()) {
+                blockMove = true;
+            }
+
             ImVec2 resolution = ImGui::GetContentRegionAvail();
-
             ImVec2 textureSize = ImVec2(texture.width * zoom, texture.height * zoom);
-
             ImVec2 texturePos;
+
             texturePos.x = std::max((resolution.x - textureSize.x) * 0.5f, 0.0f);
             texturePos.y = std::max((resolution.y - textureSize.y) * 0.5f, 0.0f);
 
             ImGui::SetCursorPos(texturePos);
-
             ImGui::Image((void*)(intptr_t)texture.id, textureSize);
 
             //-------------------------------
-            // draw
+            // draw/erase
             //-------------------------------
+            if (ImGui::IsWindowHovered()) {
 
-            if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-                std::array<float,4> temColor = { myColor[0], myColor[1], myColor[2], myColor[3] };
+                //-------------------------------
+                // draw
+                //-------------------------------
+                if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+                    std::array<float,4> temColor = { myColor[0], myColor[1], myColor[2], myColor[3] };
+                
+                    const int maxColors = 18;
+                    bool exists = false;
 
-                bool exists = false;
-                for (const auto& c : recentColors) {
-                    if (c == temColor) {
-                        exists = true;
-                        break;
+                    for (const auto& c : recentColors) {
+                        if (c == temColor) {
+                            exists = true;
+                            break;
+                        }
+                    }
+
+                    if (!exists) {
+                        recentColors.push_back(temColor);
+
+                        if (recentColors.size() > maxColors) {
+                            recentColors.erase(recentColors.begin());
+                        }
+                    } 
+
+                    ImVec2 mousePos = ImGui::GetMousePos();
+                    ImVec2 windowPos = ImGui::GetItemRectMin();
+                    float localX = (mousePos.x - windowPos.x) / zoom;
+                    float localY = (mousePos.y - windowPos.y) / zoom;
+
+                    int pixelX = (int)localX;
+                    int pixelY = (int)localY;
+
+                    if (pixelX >= 0 && pixelY < image.width && pixelY >= 0 && pixelY < image.height) {
+                        Color c = {
+                            (unsigned char)(myColor[0] * 255),
+                            (unsigned char)(myColor[1] * 255),
+                            (unsigned char)(myColor[2] * 255),
+                            (unsigned char)(myColor[3] * 255)
+                        };
+            
+                        ImageDrawPixel(&image, pixelX, pixelY, c);
+                        UpdateTexture(texture, image.data);
                     }
                 }
 
-                if (!exists) {
-                    recentColors.push_back(temColor);
-                }
+                //-------------------------------
+                //erase
+                //-------------------------------
+                if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+                    ImVec2 mousePos = ImGui::GetMousePos();
+                    ImVec2 windowPos = ImGui::GetItemRectMin();
+                    float localX = (mousePos.x - windowPos.x) / zoom;
+                    float localY = (mousePos.y - windowPos.y) / zoom;
 
-                ImVec2 mousePos = ImGui::GetMousePos();
-                ImVec2 windowPos = ImGui::GetItemRectMin();
-                float localX = (mousePos.x - windowPos.x) / zoom;
-                float localY = (mousePos.y - windowPos.y) / zoom;
+                    int pixelX = (int)localX;
+                    int pixelY = (int)localY;
 
-                int pixelX = (int)localX;
-                int pixelY = (int)localY;
-
-                if (pixelX >= 0 && pixelY < image.width && pixelY >= 0 && pixelY < image.height) {
-                    Color c = {
-                        (unsigned char)(myColor[0] * 255),
-                        (unsigned char)(myColor[1] * 255),
-                        (unsigned char)(myColor[2] * 255),
-                        (unsigned char)(myColor[3] * 255)
-                    };
-        
-                    ImageDrawPixel(&image, pixelX, pixelY, c);
-                    UpdateTexture(texture, image.data);
-                }
-            }
-
-            //-------------------------------
-            // erase
-            //-------------------------------
-
-            else if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-                ImVec2 mousePos = ImGui::GetMousePos();
-                ImVec2 windowPos = ImGui::GetItemRectMin();
-                float localX = (mousePos.x - windowPos.x) / zoom;
-                float localY = (mousePos.y - windowPos.y) / zoom;
-
-                int pixelX = (int)localX;
-                int pixelY = (int)localY;
-
-                if (pixelX >= 0 && pixelY < image.width && pixelY >= 0 && pixelY < image.height) {
-                    Color c = {
-                        (unsigned char)(transparent[0] * 255),
-                        (unsigned char)(transparent[1] * 255),
-                        (unsigned char)(transparent[2] * 255),
-                        (unsigned char)(transparent[3] * 255)
-                    };
-        
-                    ImageDrawPixel(&image, pixelX, pixelY, c);
-                    UpdateTexture(texture, image.data);
+                    if (pixelX >= 0 && pixelY < image.width && pixelY >= 0 && pixelY < image.height) {
+                        Color c = {
+                            (unsigned char)(transparent[0] * 255),
+                            (unsigned char)(transparent[1] * 255),
+                            (unsigned char)(transparent[2] * 255),
+                            (unsigned char)(transparent[3] * 255)
+                        };
+            
+                        ImageDrawPixel(&image, pixelX, pixelY, c);
+                        UpdateTexture(texture, image.data);
+                    }
                 }
             }
 
         ImGui::EndChild();
-
         ImGui::End();
+        
+        //-------------------------------
+        // set ImGuiWindowFlags_NoMove if mouse in "Pixel Window" area
+        //-------------------------------
+        if (blockMove) {
+            windowFlags |= ImGuiWindowFlags_NoMove;
+        }
+        else {
+            windowFlags &= ~ImGuiWindowFlags_NoMove;
+        }
+
     }
 }

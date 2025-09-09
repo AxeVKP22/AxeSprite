@@ -19,6 +19,7 @@ int newWidth;
 int newHeight;
 
 std::vector<std::string> canvasNames;
+
 //-------------------------------
 // main menu render 
 //-------------------------------
@@ -60,6 +61,7 @@ void imGuiRenderMenuWindow(const char* windowName) {
     }
     ImGui::End();
 }
+
 //-------------------------------
 // render sub menu
 //-------------------------------
@@ -79,6 +81,7 @@ void imGuiRenderFileSubMenu() {
     }
     ImGui::End();
 }
+
 //-------------------------------
 // create a new file
 //-------------------------------

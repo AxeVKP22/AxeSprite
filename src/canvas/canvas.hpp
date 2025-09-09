@@ -12,6 +12,7 @@
 
 extern float myColor[4];
 extern float transparent[4];
+extern ImGuiWindowFlags windowFlags;
 
 extern float zoom;
 
