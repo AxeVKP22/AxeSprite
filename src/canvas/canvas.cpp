@@ -14,6 +14,9 @@ Image image;
 float zoom = 1.0f;
 ImVec2 resolution;
 
+//-------------------------------
+// RenderCanvasWindow "Rustafied.com - US Long, T17"
+//-------------------------------
 void imGuiRenderCanvasWindow(const char* windowName) {
     for (int i = 0; i < canvasNames.size(); i++) {
 
@@ -44,7 +47,10 @@ void imGuiRenderCanvasWindow(const char* windowName) {
         ImGui::Begin((std::string("Canvas: ") + canvasNames[i]).c_str(), 0, windowFlags);
 
         ImGui::BeginChild("file", ImVec2(150, 30));
-            ImGui::SmallButton("File");
+            /*if (ImGui::SmallButton("File")) {
+                imGuiSaveAs(image);
+                UnloadImage(image);
+            }*/
         ImGui::EndChild();
 
         //-------------------------------
@@ -199,3 +205,25 @@ void imGuiRenderCanvasWindow(const char* windowName) {
 
     }
 }
+
+/*void imGuiSaveAs(Image image) {
+    #ifdef _WIN32
+        char szFile[MAX_PATH];
+
+        OPENFILENAME ofn = {};
+        ofn.lStructSize = sizeof(ofn);
+        ofn.lpstrFile = szFile;
+        ofn.nMaxFile = MAX_PATH;
+        ofn.lpstrFilter = "PNG Files\0*.png\0All Files\0*.*\0";
+        ofn.nFilterIndex = 1;
+        ofn.lpstrTitle = "Save As...";
+        ofn.Flags = OFN_OVERWRITEPROMPT;
+        if (GetSaveFileName(&ofn)) {
+            std::string fl = ofn.lpstrFile;
+            if (fl.find('.') == std::string::npos) {
+                fl += ".png";
+            }
+            ExportImage(image, fl.c_str());
+        }
+    #endif
+}*/
