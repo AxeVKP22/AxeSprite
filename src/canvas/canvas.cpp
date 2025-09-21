@@ -14,11 +14,17 @@ Image image;
 float zoom = 1.0f;
 ImVec2 resolution;
 
+bool NisFileSubMenuOpen = true;
+
 //-------------------------------
 // RenderCanvasWindow "Rustafied.com - US Long, T17"
 //-------------------------------
 void imGuiRenderCanvasWindow(const char* windowName) {
     for (int i = 0; i < canvasNames.size(); i++) {
+
+        if (NisFileSubMenuOpen) {
+            NimGuiRenderFileSubMenu();
+        }
 
         //-------------------------------
         // create/load texture
@@ -47,10 +53,9 @@ void imGuiRenderCanvasWindow(const char* windowName) {
         ImGui::Begin((std::string("Canvas: ") + canvasNames[i]).c_str(), 0, windowFlags);
 
         ImGui::BeginChild("file", ImVec2(150, 30));
-            /*if (ImGui::SmallButton("File")) {
-                imGuiSaveAs(image);
-                UnloadImage(image);
-            }*/
+            if (ImGui::SmallButton("File")) {
+                NisFileSubMenuOpen = !NisFileSubMenuOpen;
+            }
         ImGui::EndChild();
 
         //-------------------------------
@@ -94,7 +99,7 @@ void imGuiRenderCanvasWindow(const char* windowName) {
 
         ImGui::SameLine();
     
-        //-------------------------------
+        //-------------------------------B
         // canvas
         //-------------------------------
         bool blockMove = false;
@@ -202,28 +207,23 @@ void imGuiRenderCanvasWindow(const char* windowName) {
         else {
             windowFlags &= ~ImGuiWindowFlags_NoMove;
         }
-
     }
 }
 
-/*void imGuiSaveAs(Image image) {
-    #ifdef _WIN32
-        char szFile[MAX_PATH];
+void NimGuiRenderFileSubMenu() {
+    ImGui::Begin("Canvas file submenu", nullptr, ImGuiWindowFlags_NoResize);
 
-        OPENFILENAME ofn = {};
-        ofn.lStructSize = sizeof(ofn);
-        ofn.lpstrFile = szFile;
-        ofn.nMaxFile = MAX_PATH;
-        ofn.lpstrFilter = "PNG Files\0*.png\0All Files\0*.*\0";
-        ofn.nFilterIndex = 1;
-        ofn.lpstrTitle = "Save As...";
-        ofn.Flags = OFN_OVERWRITEPROMPT;
-        if (GetSaveFileName(&ofn)) {
-            std::string fl = ofn.lpstrFile;
-            if (fl.find('.') == std::string::npos) {
-                fl += ".png";
-            }
-            ExportImage(image, fl.c_str());
-        }
-    #endif
-}*/
+    if (ImGui::SmallButton("Save")) {
+        std::string path = imGuiSaveAs();
+        ExportImage(image, path.c_str());
+    }
+
+    if (ImGui::SmallButton("Close")) {
+        NisFileSubMenuOpen = !NisFileSubMenuOpen;
+    }
+
+    if (ImGui::SmallButton("Exit")) {
+        CloseWindow();
+    }
+    ImGui::End();
+}

@@ -85,7 +85,7 @@ void imGuiRenderFileSubMenu() {
 }
 
 //-------------------------------
-// create a new file
+// create a new fileImGui::SetWindowSize(ImGui::GetWindowContentRegionMax());
 //-------------------------------
 void imGuiRenderNewSubMenu() {
     ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiCond_Always);

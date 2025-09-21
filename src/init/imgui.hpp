@@ -6,5 +6,5 @@
 #include "backends/imgui_impl_opengl3.h"
 
 void rlCreateWindow(int width, int height, const char* title);
-void rlShutdownWindow(GLFWwindow* window);
+void rlShutdownWindow();
 

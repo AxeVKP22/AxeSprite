@@ -6,8 +6,7 @@
                 "${workspaceFolder}/src",
                 "${workspaceFolder}/libs/raylib/",
                 "${workspaceFolder}/libs/rlImGui",
-                "${workspaceFolder}/libs/imgui",
-                "${workspaceFolder}/libs/stb"
+                "${workspaceFolder}/libs/imgui"
             ],
             "defines": [],
             "compilerPath": "C:/w64devkit/w64devkit/bin/g++.exe",

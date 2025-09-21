@@ -8,13 +8,12 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "../menu/menu.hpp"
+#include "save.hpp"
+#include "../init/imgui.hpp"
 
 extern "C" {
     #include "raylib.h"
 }
-
-
-
 
 #define MAX_PATH_LENGHT 260
 
@@ -22,8 +21,9 @@ extern float myColor[4];
 extern float transparent[4];
 extern ImGuiWindowFlags windowFlags;
 
+extern bool NisFileSubMenuOpen;
+
 extern float zoom;
 
 void imGuiRenderCanvasWindow(const char* windowName);
-
-void imGuiSaveAs(Image image);
+void NimGuiRenderFileSubMenu();

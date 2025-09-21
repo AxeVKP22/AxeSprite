@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 
+
 #define MAX_PATH_LENGHT 260
 
 extern bool isFileSubMenuOpen;

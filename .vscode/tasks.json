@@ -11,6 +11,7 @@
                 "src/init/imgui.cpp",
                 "src/menu/menu.cpp",
                 "src/canvas/canvas.cpp",
+                "src/canvas/save.cpp",
                 "libs/rlImGui/rlImGui.cpp",
                 "libs/imgui/imgui.cpp",
                 "libs/imgui/imgui_draw.cpp",
@@ -29,14 +30,19 @@
                 "-lshell32",
                 "-lcomdlg32",
                 "-o",
-                "build/AxeSprite.exe"
+                "build/AxeSprite.exe",
+                "-Wl,-subsystem,windows"
             ],
             "group": "build",
             "problemMatcher": [
                 "$gcc"
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
+                "shell": {
+                    "executable": "cmd.exe",
+                    "args": ["/c"]
+                }
             }
         }
     ]
