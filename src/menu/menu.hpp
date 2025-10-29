@@ -17,6 +17,7 @@ extern bool isNewSelected;
 
 extern char pathToFile[MAX_PATH_LENGHT];
 extern char newName[32];
+extern int selectedItem;
 
 extern int newWidth;
 extern int newHeight;

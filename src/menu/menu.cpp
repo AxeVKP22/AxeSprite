@@ -14,6 +14,7 @@ bool isNewSelected;
 
 char pathToFile[MAX_PATH_LENGHT];
 char newName[32];
+int selectedItem = 0;
 
 int newWidth;
 int newHeight;
@@ -23,7 +24,8 @@ std::vector<std::string> canvasNames;
 //-------------------------------
 // main menu render 
 //-------------------------------
-void imGuiRenderMenuWindow(const char* windowName) {                                                         
+void imGuiRenderMenuWindow(const char* windowName) {
+
     ImGui::SetNextWindowSize(ImVec2(315, 150), ImGuiCond_Once);
     ImGui::Begin(windowName, nullptr);
 
@@ -69,7 +71,7 @@ void imGuiRenderMenuWindow(const char* windowName) {
 //-------------------------------
 void imGuiRenderFileSubMenu() {
     ImGui::SetNextWindowSize(ImVec2(120, 90), ImGuiCond_Once);
-    ImGui::Begin("File submenu", nullptr, ImGuiWindowFlags_NoResize);
+    ImGui::Begin("File submenu", nullptr);
     if (ImGui::SmallButton("New file")) {
         isNewPressed = !isNewPressed;
     }
@@ -85,14 +87,28 @@ void imGuiRenderFileSubMenu() {
 }
 
 //-------------------------------
-// create a new fileImGui::SetWindowSize(ImGui::GetWindowContentRegionMax());
+// create a new file
 //-------------------------------
 void imGuiRenderNewSubMenu() {
-    ImGui::SetNextWindowSize(ImVec2(200, 200), ImGuiCond_Always);
+    const char* colors[] = {"White", "Black", "Transparent"};
+    ImGui::SetNextWindowSize(ImVec2(210, 200), ImGuiCond_Once);
     ImGui::Begin("New", nullptr);
     ImGui::InputInt("width", &newWidth);
     ImGui::InputInt("height", &newHeight);
     ImGui::InputText("Name", newName, 32);
+
+    if (ImGui::BeginCombo("Bg color", colors[selectedItem])) {
+        for (int i; i < IM_ARRAYSIZE(colors); i++) {
+            bool isSelected = (selectedItem == i);
+            if (ImGui::Selectable(colors[i], isSelected)) {
+                selectedItem = i;
+            }
+            if (isSelected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
 
     if (ImGui::SmallButton("Create")) {
         if (newWidth > 0 && newHeight > 0 && strlen(newName) > 0) {
@@ -109,6 +125,7 @@ void imGuiRenderNewSubMenu() {
                 isNewPressed = false;
                 isNewSelected = true;
             }
+            isFileSubMenuOpen = false;
         }
     }   
 
@@ -142,6 +159,9 @@ returnOpenCode imGuiRenderOpenSubMenu() {
         std::string fileNameOnly = lastSlash ? std::string(lastSlash + 1) : std::string(pathToFile);
 
         isOpenSelected = true;
+        if (isOpenSelected) {
+            isFileSubMenuOpen = false;
+        }
 
         return {true, fileNameOnly};
     }

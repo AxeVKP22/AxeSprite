@@ -11,7 +11,7 @@ int main() {
 
     rlCreateWindow(800, 800, "AxeSprite");
 
-    Image icon = LoadImage("C:\\GitHub\\AxeSprite\\tests\\test.png");
+    Image icon = LoadImage("C:\\GitHub\\AxeSprite\\tests\\avatar.png");
     SetWindowIcon(icon);
     UnloadImage(icon);
 
